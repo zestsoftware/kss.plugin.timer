@@ -1,0 +1,12 @@
+#timer_start:timer-start(mytimer) {
+    timer-start-displayformat: '%d:%H:%M:%S';
+}
+
+#timer_end:timer-end(mytimer) {
+    timer-end-reset: false;
+}
+
+#timer_display:timer-update(mytimer) {
+    action-server: register_time_spent;
+    register_time_spent-seconds: pass(seconds);
+}
