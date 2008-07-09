@@ -1,12 +1,14 @@
-#timer_start:timer-start(mytimer) {
-    timer-start-displayformat: '%d:%H:%M:%S';
+#start1:timer-start(mytimer) {
+    evt-timer-start-displayformat: '%h:%0M:%0S';
 }
 
-#timer_end:timer-end(mytimer) {
-    timer-end-reset: false;
+#stop1:timer-stop(mytimer) {
+    action-client: alert;
+    alert-message: pass(seconds);
+    evt-timer-stop-reset: true;
 }
 
-#timer_display:timer-update(mytimer) {
-    action-server: register_time_spent;
-    register_time_spent-seconds: pass(seconds);
+#display1:timer-update(mytimer) {
+    action-client: log;
+    log-message: pass(seconds);
 }

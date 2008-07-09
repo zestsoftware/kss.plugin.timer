@@ -5,7 +5,7 @@ from kssplugintimer.commands import KssplugintimerCommands
 package_dir = os.path.dirname(os.path.abspath(__file__))
 javascript_dir = os.path.join(package_dir, 'javascript')
 
-class Kssplugintimer(Plugin):
+class Timer(Plugin):
     
     javascripts = [os.path.join(javascript_dir, 'plugin.js')]
     
@@ -17,8 +17,7 @@ class Kssplugintimer(Plugin):
     # extra_javascripts = [] javascripts_from(os.path.join(package_dir, '3rd_party'))
 
     commandsets = {
-        'kss.plugin.timer': KssplugintimerCommands,
-        }
+    }
 
     selectors = []
 

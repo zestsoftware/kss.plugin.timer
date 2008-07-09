@@ -11,41 +11,21 @@
     <!-- Include demo setup conditionally -->
     <include zcml:condition="installed kss.demo" package=".demo" />
 
-    <!-- Third party library dependencies -->
-
    <!-- Event types -->
   
     <kss:eventtype
-        name="yuidnd-drop"
+        name="timer-start"
         jsfile="javascript/kss_timer.js"
         />
   
     <kss:eventtype
-        name="yuidnd-dragstart"
-        jsfile="javascript/kss_dragdrop.js"
+        name="timer-stop"
+        jsfile="javascript/kss_timer.js"
         />
   
     <kss:eventtype
-        name="yuidnd-dragsuccess"
-        jsfile="javascript/kss_dragdrop.js"
+        name="timer-update"
+        jsfile="javascript/kss_timer.js"
         />
   
-    <kss:eventtype
-        name="yuidnd-dragfailure"
-        jsfile="javascript/kss_dragdrop.js"
-        />
-
-    <!-- Client actions & commands -->
-
-    <kss:action
-        name="yuidnd-resetPosition"
-        jsfile="javascript/kss_dragdrop.js"
-        command_factory="selector"
-        params_mandatory=""
-        params_optional=""
-        />
-
-
-    <!-- Command sets -->
-
 </configure>

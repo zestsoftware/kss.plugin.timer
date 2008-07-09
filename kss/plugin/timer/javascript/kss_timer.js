@@ -41,7 +41,8 @@ kukit.timer = new function kukit_plugin_timer() {
 
     Timer.prototype._init = function _init(displayformat, displayels,
                                            startbuttons, stopbuttons,
-                                           onstart, onstop, onupdate) {
+                                           onstart, onstop, onupdate,
+                                           resetonstop) {
         this.displayformat = displayformat;
         this.displayels = displayels || [];
         this.startbuttons = startbuttons || [];
@@ -49,14 +50,16 @@ kukit.timer = new function kukit_plugin_timer() {
         this.onstart = onstart || function() {};
         this.onstop = onstop || function() {};
         this.onupdate = onupdate || function() {};
-        this.starttime = null;
-        this.interval = null;
+        this.resetonstop = resetonstop;
+        this._starttime = null;
+        this._lastvalue = null;
+        this._interval = null;
 
         this.update_event_registrations();
     };
 
     Timer.prototype.add_display_el = function add_display_el(el) {
-        this.display_els.push(el);
+        this.displayels.push(el);
     };
 
     Timer.prototype.add_start_button = function add_start_button(b) {
@@ -89,32 +92,52 @@ kukit.timer = new function kukit_plugin_timer() {
     };
 
     Timer.prototype.start = function start() {
-        this.starttime = (new Date()).getTime();
+        this._starttime = (new Date()).getTime();
         var self = this;
         window.__timer_update_function = function() {
             self.update();
         };
-        this.interval = window.setInterval('__timer_update_function()', 100);
+        this._interval = window.setInterval('__timer_update_function()', 100);
         this.onstart();
     };
 
     Timer.prototype.stop = function stop() {
-        if (!this.interval) {
+        if (!this._interval) {
             return;
         };
-        window.clearInterval(this.interval);
-        this.interval = null;
-        this.onstop();
+        window.clearInterval(this._interval);
+        this._interval = null;
+        var secs = parseInt(((new Date()).getTime() - this._starttime) / 1000);
+        if (this.resetonstop) {
+            this._starttime = null;
+            var formatters = ['%s', '%S', '%M', '%H', '%h', '%d',
+                              '%0S', '%0M', '%0H'];
+            var formatstr = this.displayformat;
+            for (var i=0; i < formatters.length; i++) {
+                var reg = new RegExp(formatters[i], 'g');
+                formatstr = formatstr.replace(reg, '0');
+            };
+            for (var i=0; i < this.displayels.length; i++) {
+                this.displayels[i].innerHTML = formatstr;
+            };
+        };
+        this.onstop({defaultParameters: {'seconds': secs}});
     };
 
     Timer.prototype.update = function update() {
-        var secs = (new Date()).getTime() - this.starttime;
+        var secs = parseInt(((new Date()).getTime() - this._starttime) / 1000);
+        var minutes = parseInt(secs / 60) % 60;
+        var allhours = parseInt(secs / 3600);
+        var dayhours = allhours % 24;
         var timedata = {
             '%s': secs,
             '%S': secs % 60,
-            '%M': parseInt(secs / 60) % 60,
-            '%h': parseInt(secs / 3600),
-            '%H': parseInt(secs / 3600) % 24,
+            '%0S': secs < 9 ? '0' + secs : secs,
+            '%M': minutes,
+            '%0M': minutes < 9 ? '0' + minutes : minutes,
+            '%h': allhours,
+            '%H': dayhours,
+            '%0H': dayhours < 9 ? '0' + dayhours : dayhours,
             '%d': parseInt(secs / (3600 * 24))
         };
         var formatstr = this.displayformat;
@@ -122,7 +145,13 @@ kukit.timer = new function kukit_plugin_timer() {
             var r = new RegExp(formatter, 'g');
             formatstr = formatstr.replace(r, timedata[formatter]);
         };
-        this.displayel.innerHTML = formatstr;
+        if (formatstr == this._lastvalue) {
+            return;
+        };
+        this._lastvalue = formatstr;
+        for (var i=0; i < this.displayels.length; i++) {
+            this.displayels[i].innerHTML = formatstr;
+        };
         this.onupdate({defaultParameters: {'seconds': secs}});
     };
 
@@ -134,16 +163,16 @@ kukit.timer = new function kukit_plugin_timer() {
 
     TimerEventBinder.prototype.__bind__ =
             function __bind__(opers_by_eventname) {
-;;;     oper.componentName = '[kss.plugin.timer] event binding';
         var node;
         var config = {
+            displayformat: undefined,
+            resetonstop: undefined,
             displayels: [],
             startbuttons: [],
             stopbuttons: [],
-            displayformat: '%s',
-            onstart: function() {},
-            onstop: function() {},
-            onupdate: function() {}
+            onstart: undefined,
+            onstop: undefined,
+            onupdate: undefined
         };
         if (opers_by_eventname.start) {
             var bindoper = opers_by_eventname.start;
@@ -167,6 +196,11 @@ kukit.timer = new function kukit_plugin_timer() {
                 throw new Error('node not found for timer-stop event');
             };
             config.stopbuttons.push(node);
+            bindoper.evaluateParameters([], {
+                reset: '%s',
+            });
+            bindoper.evalBool('reset');
+            config.resetonstop = bindoper.parms.reset;
             if (bindoper.hasExecuteActions()) {
                 config.onstop = bindoper.makeExecuteActionsHook();
             };
@@ -184,6 +218,9 @@ kukit.timer = new function kukit_plugin_timer() {
         if (this.timer) {
             if (config.displayformat) {
                 this.timer.displayformat = config.displayformat;
+            };
+            if (config.resetonstop !== undefined) {
+                this.timer.resetonstop = config.resetonstop;
             };
             for (var i=0; i < config.displayels.length; i++) {
                 this.timer.add_display_el(config.displayels[i]);
@@ -204,13 +241,14 @@ kukit.timer = new function kukit_plugin_timer() {
                 this.timer.onupdate = config.onupdate;
             };
         } else {
-            var t = this.timer = new Timer(config.displayformat,
+            var t = this.timer = new Timer(config.displayformat || '%s',
                                            config.displayels,
                                            config.startbuttons,
                                            config.stopbuttons,
                                            config.onstart,
                                            config.onstop,
-                                           config.onupdate);
+                                           config.onupdate,
+                                           config.resetonstop);
         };
     };
 
