@@ -39,11 +39,14 @@ kukit.timer = new function kukit_plugin_timer() {
         };
     };
 
-    Timer.prototype._init = function _init(displayformat, displayels,
+    Timer.prototype._init = function _init(displayformat_nohours,
+                                           displayformat_hours,
+                                           displayels,
                                            startbuttons, stopbuttons,
                                            onstart, onstop, onupdate,
                                            resetonstop) {
-        this.displayformat = displayformat;
+        this.displayformat_nohours = displayformat_nohours;
+        this.displayformat_hours = displayformat_hours;
         this.displayels = displayels || [];
         this.startbuttons = startbuttons || [];
         this.stopbuttons = stopbuttons || [];
@@ -112,10 +115,14 @@ kukit.timer = new function kukit_plugin_timer() {
             this._starttime = null;
             var formatters = ['%s', '%S', '%M', '%H', '%h', '%d',
                               '%0S', '%0M', '%0H'];
-            var formatstr = this.displayformat;
+            var formatstr = this.displayformat_nohours;
             for (var i=0; i < formatters.length; i++) {
                 var reg = new RegExp(formatters[i], 'g');
-                formatstr = formatstr.replace(reg, '0');
+                var replace = '0';
+                if (formatters[i].charAt(1) == '0') {
+                    replace = '00';
+                };
+                formatstr = formatstr.replace(reg, replace);
             };
             for (var i=0; i < this.displayels.length; i++) {
                 this.displayels[i].innerHTML = formatstr;
@@ -126,21 +133,26 @@ kukit.timer = new function kukit_plugin_timer() {
 
     Timer.prototype.update = function update() {
         var secs = parseInt(((new Date()).getTime() - this._starttime) / 1000);
+        var currsecs = secs % 60;
         var minutes = parseInt(secs / 60) % 60;
         var allhours = parseInt(secs / 3600);
         var dayhours = allhours % 24;
         var timedata = {
             '%s': secs,
-            '%S': secs % 60,
-            '%0S': secs < 9 ? '0' + secs : secs,
+            '%S': currsecs,
+            '%0S': currsecs < 10 ? '0' + currsecs : currsecs,
             '%M': minutes,
-            '%0M': minutes < 9 ? '0' + minutes : minutes,
+            '%0M': minutes < 10 ? '0' + minutes : minutes,
             '%h': allhours,
             '%H': dayhours,
-            '%0H': dayhours < 9 ? '0' + dayhours : dayhours,
+            '%0H': dayhours < 10 ? '0' + dayhours : dayhours,
             '%d': parseInt(secs / (3600 * 24))
         };
-        var formatstr = this.displayformat;
+        if (allhours > 0) {
+            var formatstr = this.displayformat_hours;
+        } else {
+            var formatstr = this.displayformat_nohours;
+        };
         for (var formatter in timedata) {
             var r = new RegExp(formatter, 'g');
             formatstr = formatstr.replace(r, timedata[formatter]);
@@ -165,7 +177,8 @@ kukit.timer = new function kukit_plugin_timer() {
             function __bind__(opers_by_eventname) {
         var node;
         var config = {
-            displayformat: undefined,
+            displayformat_nohours: undefined,
+            displayformat_hours: undefined,
             resetonstop: undefined,
             displayels: [],
             startbuttons: [],
@@ -183,9 +196,12 @@ kukit.timer = new function kukit_plugin_timer() {
             };
             config.startbuttons.push(node);
             bindoper.evaluateParameters([], {
-                displayformat: '%s',
+                displayformat_nohours: '%M:%0S',
+                displayformat_hours: '%h:%0M:%0S'
             });
-            config.displayformat = bindoper.parms.displayformat;
+            config.displayformat_nohours =
+                bindoper.parms.displayformat_nohours;
+            config.displayformat_hours = bindoper.parms.displayformat_hours;
             if (bindoper.hasExecuteActions()) {
                 config.onstart = bindoper.makeExecuteActionsHook();
             };
@@ -216,8 +232,13 @@ kukit.timer = new function kukit_plugin_timer() {
             };
         };
         if (this.timer) {
-            if (config.displayformat) {
-                this.timer.displayformat = config.displayformat;
+            if (config['displayformat_nohours']) {
+                this.timer.displayformat_nohours =
+                    config['displayformat_nohours'];
+            };
+            if (config['displayformat_hours']) {
+                this.timer.displayformat_hours =
+                    config['displayformat_hours'];
             };
             if (config.resetonstop !== undefined) {
                 this.timer.resetonstop = config.resetonstop;
@@ -241,7 +262,10 @@ kukit.timer = new function kukit_plugin_timer() {
                 this.timer.onupdate = config.onupdate;
             };
         } else {
-            var t = this.timer = new Timer(config.displayformat || '%s',
+            var dfnh = config['displayformat_nohours'];
+            var dfh = config['displayformat_hours'];
+            var t = this.timer = new Timer(dfnh || '%0M:%0S',
+                                           dfh || '%h:%0M:%0S',
                                            config.displayels,
                                            config.startbuttons,
                                            config.stopbuttons,

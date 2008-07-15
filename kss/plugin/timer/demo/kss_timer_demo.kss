@@ -1,5 +1,6 @@
 #start1:timer-start(mytimer) {
-    evt-timer-start-displayformat: '%h:%0M:%0S';
+    evt-timer-start-displayformat_nohours: '%0M:%0S';
+    evt-timer-start-displayformat_hours: '%h:%0M:%0S';
 }
 
 #stop1:timer-stop(mytimer) {
