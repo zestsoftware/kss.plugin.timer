@@ -7,11 +7,18 @@
   <body>
     <p metal:use-macro="context/@@body_macros/header">header</p>
     <form action="." method="post" onsubmit="return false">
+      <h3>Timer with reset button</h3>
       <div id="timer1">
-        <div id="display1">0:00:00</div>
+        <div id="display1">00:00</div>
         <input type="button" id="start1" value="start" />
         <input type="button" id="restart1" value="restart" />
         <input type="button" id="stop1" value="stop" />
+      </div>
+      <h3>Timer with day display</h3>
+      <div id="timer2">
+        <div id="display2">0:00:00:00</div>
+        <input type="button" id="start2" value="start" />
+        <input type="button" id="stop2" value="stop" />
       </div>
     </form>
   </body>
