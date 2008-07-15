@@ -43,15 +43,18 @@ kukit.timer = new function kukit_plugin_timer() {
                                            displayformat_hours,
                                            displayels,
                                            startbuttons, stopbuttons,
-                                           onstart, onstop, onupdate,
+                                           resetbuttons,
+                                           onstart, onstop, onreset, onupdate,
                                            resetonstop) {
         this.displayformat_nohours = displayformat_nohours;
         this.displayformat_hours = displayformat_hours;
         this.displayels = displayels || [];
         this.startbuttons = startbuttons || [];
         this.stopbuttons = stopbuttons || [];
+        this.resetbuttons = resetbuttons || [];
         this.onstart = onstart || function() {};
         this.onstop = onstop || function() {};
+        this.onreset = onreset || function() {};
         this.onupdate = onupdate || function() {};
         this.resetonstop = resetonstop;
         this._starttime = null;
@@ -75,6 +78,11 @@ kukit.timer = new function kukit_plugin_timer() {
         this.update_event_registrations();
     };
 
+    Timer.prototype.add_reset_button = function add_reset_button(b) {
+        this.resetbuttons.push(b);
+        this.update_event_registrations();
+    };
+
     Timer.prototype.update_event_registrations =
             function update_event_registrations() {
         var self = this;
@@ -92,19 +100,31 @@ kukit.timer = new function kukit_plugin_timer() {
                 b.__timer_events_registered = true;
             };
         };
+        for (var i=0; i < this.resetbuttons.length; i++) {
+            var b = this.resetbuttons[i];
+            if (!b.__timer_events_registered) {
+                register_event(b, 'click', function() {self.reset();});
+                b.__timer_events_registered = true;
+            };
+        };
     };
 
-    Timer.prototype.start = function start() {
+    Timer.prototype.start = function start(ignorehandler) {
+        if (this._interval) {
+            window.clearInterval(this._interval);
+        };
         this._starttime = (new Date()).getTime();
         var self = this;
         window.__timer_update_function = function() {
             self.update();
         };
         this._interval = window.setInterval('__timer_update_function()', 100);
-        this.onstart();
+        if (!ignorehandler) {
+            this.onstart();
+        };
     };
 
-    Timer.prototype.stop = function stop() {
+    Timer.prototype.stop = function stop(ignorehandler) {
         if (!this._interval) {
             return;
         };
@@ -128,7 +148,20 @@ kukit.timer = new function kukit_plugin_timer() {
                 this.displayels[i].innerHTML = formatstr;
             };
         };
-        this.onstop({defaultParameters: {'seconds': secs}});
+        if (!ignorehandler) {
+            this.onstop({defaultParameters: {seconds: secs}});
+        };
+    };
+
+    Timer.prototype.reset = function() {
+        if (!this._interval) {
+            return;
+        };
+        var secs = parseInt(((new Date()).getTime() - this._starttime) / 1000);
+        this.stop(true);
+        this._starttime = null;
+        this.start(true);
+        this.onreset({defaultParameters: {seconds: secs}});
     };
 
     Timer.prototype.update = function update() {
@@ -183,8 +216,10 @@ kukit.timer = new function kukit_plugin_timer() {
             displayels: [],
             startbuttons: [],
             stopbuttons: [],
+            resetbuttons: [],
             onstart: undefined,
             onstop: undefined,
+            onreset: undefined,
             onupdate: undefined
         };
         if (opers_by_eventname.start) {
@@ -213,12 +248,22 @@ kukit.timer = new function kukit_plugin_timer() {
             };
             config.stopbuttons.push(node);
             bindoper.evaluateParameters([], {
-                reset: '%s',
+                reset: false,
             });
             bindoper.evalBool('reset');
             config.resetonstop = bindoper.parms.reset;
             if (bindoper.hasExecuteActions()) {
                 config.onstop = bindoper.makeExecuteActionsHook();
+            };
+        } else if (opers_by_eventname.reset) {
+            var bindoper = opers_by_eventname.reset;
+            node = bindoper.node;
+            if (!node) {
+                throw new Error('node not found for timer-reset event');
+            };
+            config.resetbuttons.push(node);
+            if (bindoper.hasExecuteActions()) {
+                config.onreset = bindoper.makeExecuteActionsHook();
             };
         } else if (opers_by_eventname.update) {
             var bindoper = opers_by_eventname.update;
@@ -252,11 +297,17 @@ kukit.timer = new function kukit_plugin_timer() {
             for (var i=0; i < config.stopbuttons.length; i++) {
                 this.timer.add_stop_button(config.stopbuttons[i]);
             };
+            for (var i=0; i < config.resetbuttons.length; i++) {
+                this.timer.add_reset_button(config.resetbuttons[i]);
+            };
             if (config.onstart) {
                 this.timer.onstart = config.onstart;
             };
             if (config.onstop) {
                 this.timer.onstop = config.onstop;
+            };
+            if (config.onreset) {
+                this.timer.onreset = config.onreset;
             };
             if (config.onupdate) {
                 this.timer.onupdate = config.onupdate;
@@ -269,8 +320,10 @@ kukit.timer = new function kukit_plugin_timer() {
                                            config.displayels,
                                            config.startbuttons,
                                            config.stopbuttons,
+                                           config.resetbuttons,
                                            config.onstart,
                                            config.onstop,
+                                           config.onreset,
                                            config.onupdate,
                                            config.resetonstop);
         };
@@ -278,6 +331,6 @@ kukit.timer = new function kukit_plugin_timer() {
 
     // KSS event binding
     kukit.eventsGlobalRegistry.registerForAllEvents(
-        'timer', ['start', 'stop', 'update'],
+        'timer', ['start', 'stop', 'update', 'reset'],
         TimerEventBinder, '__bind__', null, 'Node');
 }();

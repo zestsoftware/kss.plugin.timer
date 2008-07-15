@@ -6,7 +6,12 @@
 #stop1:timer-stop(mytimer) {
     action-client: alert;
     alert-message: pass(seconds);
-    evt-timer-stop-reset: true;
+    evt-timer-stop-reset: false;
+}
+
+#restart1:timer-reset(mytimer) {
+    action-client: alert;
+    alert-message: pass(seconds);
 }
 
 #display1:timer-update(mytimer) {
