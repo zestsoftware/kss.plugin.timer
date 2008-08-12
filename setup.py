@@ -7,7 +7,7 @@ setup(
     #author="",
     #author_email="",
     #url="",
-    install_requires=["kss.base"],
+    install_requires=["kss.base", "setuptools"],
     packages=find_packages(),
     namespace_packages=['kss', 'kss.plugin'],
     include_package_data=True,
