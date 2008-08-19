@@ -70,6 +70,7 @@ kukit.timer = new function kukit_plugin_timer() {
         this._lastvalue = null;
         this._interval = null;
         this._running = false;
+        this._hasrun = false;
 
         if (startvalue) {
             this.start();
@@ -181,7 +182,7 @@ kukit.timer = new function kukit_plugin_timer() {
         };
         this._starttime = (new Date()).getTime();
         var self = this;
-        fname = '__timer_update_function_' + (++Timer._num_instances);
+        var fname = '__timer_update_function_' + (++Timer._num_instances);
         window[fname]  = function() {
             self.update();
         };
@@ -190,6 +191,7 @@ kukit.timer = new function kukit_plugin_timer() {
             this.onstart();
         };
         this._running = true;
+        this._hasrun = true;
     };
 
     Timer.prototype.stop = function stop(ignorehandler) {
@@ -276,7 +278,7 @@ kukit.timer = new function kukit_plugin_timer() {
             set to something from the KSS sheet, but after the timer has been
             instantiated.
         */
-        if (this.startvalue && !this._running) {
+        if (this.startvalue && !this._hasrun) {
             this.start();
             this._starttime -= (this.startvalue * 1000);
             this.update();
