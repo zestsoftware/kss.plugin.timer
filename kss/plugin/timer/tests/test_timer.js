@@ -54,3 +54,9 @@ function test_timer_functional_hours() {
     testing.assert(displayel.innerHTML == '1:00:00' ||
                    displayel.innerHTML == '1:00:01');
 };
+
+function test_timerstart() {
+    timer.startvalue = 3600;
+    timer._settings_changed();
+    testing.assert(global.currsecs == 3600 || global.currsecs == 3601);
+};

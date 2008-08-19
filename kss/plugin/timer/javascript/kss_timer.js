@@ -46,7 +46,10 @@ kukit.timer = new function kukit_plugin_timer() {
                                            displayels,
                                            startbuttons, stopbuttons,
                                            resetbuttons,
-                                           onstart, onstop, onreset, onupdate,
+                                           onstart, preventstartdefault,
+                                           onstop, preventstopdefault,
+                                           onreset, preventresetdefault,
+                                           onupdate,
                                            resetonstop, startvalue) {
         this.displayformat_nohours = displayformat_nohours;
         this.displayformat_hours = displayformat_hours;
@@ -55,8 +58,11 @@ kukit.timer = new function kukit_plugin_timer() {
         this.stopbuttons = stopbuttons || [];
         this.resetbuttons = resetbuttons || [];
         this.onstart = onstart || function() {};
+        this.preventstartdefault = preventstartdefault;
         this.onstop = onstop || function() {};
+        this.preventstopdefault = preventstopdefault;
         this.onreset = onreset || function() {};
+        this.preventresetdefault = preventresetdefault;
         this.onupdate = onupdate || function() {};
         this.resetonstop = resetonstop;
         this.startvalue = startvalue;
@@ -99,21 +105,71 @@ kukit.timer = new function kukit_plugin_timer() {
         for (var i=0; i < this.startbuttons.length; i++) {
             var b = this.startbuttons[i];
             if (!b.__timer_events_registered) {
-                register_event(b, 'click', function() {self.start();});
+                register_event(b, 'click', function(e) {
+                    self.start();
+                    if (self.preventstartdefault) {
+                        if (e.preventDefault) {
+                            e.preventDefault();
+                        } else {
+                            e.returnValue = false;
+                        };
+                    };
+                    return false;
+                });
+                if (this.preventstartdefault) {
+                    register_event(b, 'mousedown', function(e) {
+                        if (e.preventDefault) {
+                            e.preventDefault();
+                        } else {
+                            e.returnValue = false;
+                        };
+                        return false;
+                    });
+                };
                 b.__timer_events_registered = true;
             };
         };
         for (var i=0; i < this.stopbuttons.length; i++) {
             var b = this.stopbuttons[i];
             if (!b.__timer_events_registered) {
-                register_event(b, 'click', function() {self.stop();});
+                register_event(b, 'click', function(e) {
+                    self.stop();
+                    if (self.preventstopdefault) {
+                        if (e.preventDefault) {
+                            e.preventDefault();
+                        } else {
+                            e.returnValue = false;
+                        };
+                    };
+                    return false;
+                });
                 b.__timer_events_registered = true;
             };
         };
         for (var i=0; i < this.resetbuttons.length; i++) {
             var b = this.resetbuttons[i];
             if (!b.__timer_events_registered) {
-                register_event(b, 'click', function() {self.reset();});
+                register_event(b, 'click', function(e) {
+                    self.reset();
+                    if (self.preventresetdefault) {
+                        if (e.preventDefault) {
+                            e.preventDefault();
+                        } else {
+                            e.returnValue = false;
+                        };
+                    };
+                    return false;
+                });
+                if (this.preventresetdefault) {
+                    register_event(b, 'mouseup', function(e) {
+                        if (e.preventDefault) {
+                            e.preventDefault();
+                        } else {
+                            e.returnValue = false;
+                        };
+                        return false;
+                    });
+                };
                 b.__timer_events_registered = true;
             };
         };
@@ -246,8 +302,11 @@ kukit.timer = new function kukit_plugin_timer() {
             stopbuttons: [],
             resetbuttons: [],
             onstart: undefined,
+            preventstartdefault: false,
             onstop: undefined,
+            preventstopdefault: false,
             onreset: undefined,
+            preventresetdefault: false,
             onupdate: undefined
         };
         if (opers_by_eventname.start) {
@@ -260,11 +319,13 @@ kukit.timer = new function kukit_plugin_timer() {
             config.startbuttons.push(node);
             bindoper.evaluateParameters([], {
                 displayformat_nohours: '%M:%0S',
-                displayformat_hours: '%h:%0M:%0S'
+                displayformat_hours: '%h:%0M:%0S',
+                preventdefault: false
             });
             config.displayformat_nohours =
                 bindoper.parms.displayformat_nohours;
             config.displayformat_hours = bindoper.parms.displayformat_hours;
+            config.preventstartdefault = bindoper.parms.preventdefault;
             if (bindoper.hasExecuteActions()) {
                 config.onstart = bindoper.makeExecuteActionsHook();
             };
@@ -277,9 +338,11 @@ kukit.timer = new function kukit_plugin_timer() {
             config.stopbuttons.push(node);
             bindoper.evaluateParameters([], {
                 reset: false,
+                preventdefault: false
             });
             bindoper.evalBool('reset');
             config.resetonstop = bindoper.parms.reset;
+            config.preventstopdefault = bindoper.parms.preventdefault;
             if (bindoper.hasExecuteActions()) {
                 config.onstop = bindoper.makeExecuteActionsHook();
             };
@@ -290,6 +353,10 @@ kukit.timer = new function kukit_plugin_timer() {
                 throw new Error('node not found for timer-reset event');
             };
             config.resetbuttons.push(node);
+            bindoper.evaluateParameters([], {
+                preventdefault: false
+            });
+            config.preventresetdefault = bindoper.parms.preventdefault;
             if (bindoper.hasExecuteActions()) {
                 config.onreset = bindoper.makeExecuteActionsHook();
             };
@@ -344,11 +411,20 @@ kukit.timer = new function kukit_plugin_timer() {
             if (config.onstart) {
                 this.timer.onstart = config.onstart;
             };
+            if (config.preventstartdefault) {
+                this.timer.preventstartdefault = config.preventstartdefault;
+            };
             if (config.onstop) {
                 this.timer.onstop = config.onstop;
             };
+            if (config.preventstopdefault) {
+                this.timer.preventstopdefault = config.preventstopdefault;
+            };
             if (config.onreset) {
                 this.timer.onreset = config.onreset;
+            };
+            if (config.preventresetdefault) {
+                this.timer.preventresetdefault = config.preventresetdefault;
             };
             if (config.onupdate) {
                 this.timer.onupdate = config.onupdate;
@@ -364,8 +440,11 @@ kukit.timer = new function kukit_plugin_timer() {
                                            config.stopbuttons,
                                            config.resetbuttons,
                                            config.onstart,
+                                           config.preventstartdefault,
                                            config.onstop,
+                                           config.preventstopdefault,
                                            config.onreset,
+                                           config.preventresetdefault,
                                            config.onupdate,
                                            config.resetonstop,
                                            config.startvalue);
