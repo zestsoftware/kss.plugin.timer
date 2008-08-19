@@ -20,8 +20,8 @@
 }
 
 #start2:timer-start(mysecondtimer) {
-    evt-timer-start-displayformat_nohours: '%d:%0H:%0M:%0S';
-    evt-timer-start-displayformat_hours: '%d:%0H:%0M:%0S';
+    evt-timer-start-displayformat_nohours: '%d days, %H hours, %M minutes and %S seconds';
+    evt-timer-start-displayformat_hours: '%d days, %H hours, %M minutes and %S seconds';
 }
 
 #stop2:timer-stop(mysecondtimer) {

@@ -16,7 +16,9 @@
       </div>
       <h3>Timer with day display</h3>
       <div id="timer2">
-        <div id="display2">0:00:00:00</div>
+        <!-- the following timer has a start value of 1 day, and since this
+             kssattr is set it will begin to play automatically -->
+        <div id="display2" class="kssattr-timerstart-86400">0 days, 0 hours, 0 minutes and 0 seconds</div>
         <input type="button" id="start2" value="start" />
         <input type="button" id="stop2" value="stop" />
       </div>
