@@ -2,10 +2,10 @@ from setuptools import setup, find_packages
 
 setup(
     name='kss.plugin.timer',
-    version="",
+    version="0.1",
     #description="",
-    #author="",
-    #author_email="",
+    author="Guido Wesdorp and Zest software",
+    author_email="info@zestsoftware.nl",
     #url="",
     install_requires=["kss.base", "setuptools"],
     packages=find_packages(),
