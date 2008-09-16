@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 setup(
     name='kss.plugin.timer',
     version="0.2 (svn/devel)",
-    #description="",
+    description="Timer plugin for KSS",
     author="Guido Wesdorp and Zest software",
     author_email="info@zestsoftware.nl",
     url="http://pypi.python.org/pypi/kss.plugin.timer",
