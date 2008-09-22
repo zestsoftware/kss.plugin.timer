@@ -3,6 +3,11 @@ Changelog for kss.plugin.timer
 
 0.1 (unreleased)
 ----------------
+- Made slightly nicer README.txt file, and added README.txt and HISTORY.txt 
+  to package information, as 'long_description'. [simon]
+
+- Copied format parameters to the update event, so that timers that weren't 
+  started on this page can still be formatted. [simon]
 
 - Fixed nasty problem where the timer got restarted after performing a server
   action. [maurits]

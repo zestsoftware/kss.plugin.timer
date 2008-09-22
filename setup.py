@@ -1,9 +1,23 @@
 from setuptools import setup, find_packages
+import os
+
+def read_package_file(filename):
+    file = open(os.path.join('kss', 'plugin', 'timer', filename))
+    text = file.read().strip()
+    file.close()
+    return text
+
+
+readme = read_package_file('README.txt')
+history = read_package_file('HISTORY.txt')
+
+long_description = readme + '\n\n' + history
 
 setup(
     name='kss.plugin.timer',
     version="0.2 (svn/devel)",
     description="Timer plugin for KSS",
+    long_description=long_description,
     author="Guido Wesdorp and Zest software",
     author_email="info@zestsoftware.nl",
     url="http://pypi.python.org/pypi/kss.plugin.timer",
