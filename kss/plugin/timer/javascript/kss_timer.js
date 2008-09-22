@@ -369,6 +369,17 @@ kukit.timer = new function kukit_plugin_timer() {
                 throw new Error('node not found for timer-update event');
             };
             config.displayels.push(node);
+            // We need to collect display formats here as well, in case the 
+            // timer hasn't been 'started', but is updating...
+            bindoper.evaluateParameters([], {
+                displayformat_nohours: '%M:%0S',
+                displayformat_hours: '%h:%0M:%0S',
+                preventdefault: false
+            });
+            config.displayformat_nohours =
+                bindoper.parms.displayformat_nohours;
+            config.displayformat_hours = bindoper.parms.displayformat_hours;
+            
             var classes = node.className.split(' ');
             // XXX severely abusing kssAttr here, and also I guess there is
             // some API to read the kssAttr value, but it works like this, and
