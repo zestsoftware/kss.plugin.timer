@@ -1,6 +1,12 @@
 Changelog for kss.plugin.timer
 ==============================
 
+0.3 (unreleased)
+----------------
+
+- Nothing changed yet.
+
+
 0.2 (2009-01-07)
 ----------------
 - Made slightly nicer README.txt file, and added README.txt and HISTORY.txt 
