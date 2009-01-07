@@ -12,10 +12,11 @@ readme = read_package_file('README.txt')
 history = read_package_file('HISTORY.txt')
 
 long_description = readme + '\n\n' + history
+version = '0.2'
 
 setup(
     name='kss.plugin.timer',
-    version="0.2 (svn/devel)",
+    version=version,
     description="Timer plugin for KSS",
     long_description=long_description,
     author="Guido Wesdorp and Zest software",
