@@ -7,7 +7,7 @@ from kss.demo.resource import (
     KSSSeleniumTestDirectory,
     )
 from zope.interface import implements
-     
+
 # Create a mesh of provided interfaces
 # This is needed, because an utility must have a single interface.
 class IResource(IKSSDemoResource, IKSSSeleniumTestResource):
@@ -20,7 +20,7 @@ class KSSDemos(object):
     implements(IResource)
 
     demos = (
-        # List your demos here. 
+        # List your demos here.
         # (Second parameter can be a subcategory within the demo if needed.)
         KSSDemo('timer', '', 'kss_timer_demo.html',
                 'Timer functionality for KSS'),
