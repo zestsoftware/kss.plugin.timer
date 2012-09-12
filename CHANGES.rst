@@ -4,7 +4,8 @@ Changelog for kss.plugin.timer
 1.1 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Moved to github: https://github.com/zestsoftware/kss.plugin.timer
+  [maurits]
 
 
 1.0 (2010-09-23)
