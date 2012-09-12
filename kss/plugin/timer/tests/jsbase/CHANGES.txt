@@ -1,0 +1,89 @@
+Changelog of the JSBase JS library
+==================================
+
+0.2, released 2009/11/12
+------------------------
+
+* added array.filter() function
+
+* made misclib.addEventHandler more flexible
+
+* added array.extend() function
+
+* made that apostrophe entitizing is optional in string.entitize()
+
+* made that array.map() doesn't change the array in-place by default
+
+* fixed problem with JS exception info lines that contained a @
+
+* made that exceptions in testing's setup and teardown are reported as test
+  failures
+
+* made that Timer.cancel() doesn't fail anymore if the function is removed
+
+* made that array.map() returns the array rather than the array module
+
+* added string.makeQuery()
+
+* made that comment data is no longer entitized
+
+* renamed array._compare() to array.equals() and made it publically accessible
+
+* added testing.assertNotEquals()
+
+* added the option to make a trace get printed from testing.debug()
+
+* removed exception lib dependency for testing.js
+
+* fixed misclib.repr(null)
+
+* made that all testing.assert* methods accept a message argument
+
+* added array.remove() function
+
+* improved (de)entitizing in string lib
+
+* added support for 'external' entities (defined in e.g. the DTD, user has to
+  take care of providing) and numbered/hex ones (only de-entitizing)
+
+* made that logging is done to the Firebug console, if available
+
+* added server.load_dom_sync() method
+
+* improved error reporting on bugs in event handlers
+
+* added support for cancelling scheduled calls (using misclib.unschedule, which
+  is a shortcut for misclib.Timer.cancel)
+
+* improved array.indexOf() comparison functionality
+
+* added NameError and KeyError
+
+* added string.parseQuery()
+
+* added new arguments to server.load_sync() and server.load_async()
+
+* improved XHR instantiation in IE and made that responseXML is provided
+  to the handler, if available
+
+* fixed problems in misclib.repr() that were caused by adding some error
+  tolerance
+  
+* fixed multi-line printing in JS conftest
+
+* improved error reporting in misclib.dir()
+
+* added domlib (dom.js) containing XML DOM helpers
+
+* improved error handling for misclib.addEventHandler()
+
+* changed func.fixContext()  so that the context is no longer used as the
+  first arg to the callable
+
+* fixed some references to array.StopIteration()
+
+* fixed copy/paste issues in comparison code in unit test api
+
+* fixed some problems in testing.assertEquals() (better comparison)
+
+
