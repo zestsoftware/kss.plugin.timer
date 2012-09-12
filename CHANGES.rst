@@ -1,7 +1,7 @@
 Changelog for kss.plugin.timer
 ==============================
 
-1.1 (unreleased)
+1.1 (2012-09-12)
 ----------------
 
 - Moved to github: https://github.com/zestsoftware/kss.plugin.timer

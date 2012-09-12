@@ -4,7 +4,7 @@ readme = open('README.txt').read().strip()
 history = open('CHANGES.rst').read().strip()
 
 long_description = readme + '\n\n' + history
-version = '1.1.dev0'
+version = '1.1'
 
 setup(
     name='kss.plugin.timer',
