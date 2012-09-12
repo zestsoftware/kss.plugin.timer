@@ -21,7 +21,7 @@ setup(
     long_description=long_description,
     author="Guido Wesdorp and Zest software",
     author_email="info@zestsoftware.nl",
-    url="http://pypi.python.org/pypi/kss.plugin.timer",
+    url="https://github.com/zestsoftware/kss.plugin.timer",
     install_requires=["kss.base", "setuptools"],
     packages=find_packages(),
     namespace_packages=['kss', 'kss.plugin'],
