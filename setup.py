@@ -1,18 +1,10 @@
 from setuptools import setup, find_packages
-import os
 
-def read_package_file(filename):
-    file = open(os.path.join('kss', 'plugin', 'timer', filename))
-    text = file.read().strip()
-    file.close()
-    return text
-
-
-readme = read_package_file('README.txt')
-history = read_package_file('HISTORY.txt')
+readme = open('README.txt').read().strip()
+history = open('CHANGES.rst').read().strip()
 
 long_description = readme + '\n\n' + history
-version = '1.1dev'
+version = '1.1.dev0'
 
 setup(
     name='kss.plugin.timer',
@@ -26,7 +18,7 @@ setup(
     packages=find_packages(),
     namespace_packages=['kss', 'kss.plugin'],
     include_package_data=True,
-    test_suite = 'kss.plugin.timer.tests.test_suite',
+    test_suite='kss.plugin.timer.tests.test_suite',
     entry_points={
         'kss.plugin': [
             'kss.plugin.timer=kss.plugin.timer.config:Kss.plugin.timer'
